@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <!-- Aucune ressource externe, aucune requête réseau depuis la page (connect-src 'none'). -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'none'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>BABI A.C Player Rating</title>
+  <meta name="description" content="Calculatrice d’évaluation des joueurs du club BABI A.C (EA SPORTS FC Clubs). Calcul local, aucune donnée transmise.">
+  <meta name="theme-color" content="#070b16">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BABI Rating">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/emblem.svg" type="image/svg+xml">
+  <link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Aller au contenu</a>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img class="brand-emblem" src="icons/emblem.svg" alt="" width="40" height="40">
+        <div class="brand-text">
+          <span class="brand-name">BABI A.C</span>
+          <span class="brand-sub">Player Rating</span>
+        </div>
+      </div>
+      <nav class="tabs" role="tablist" aria-label="Navigation">
+        <button class="tab" role="tab" id="tab-eval" aria-controls="view-eval" aria-selected="true" data-view="eval">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/></svg>
+          Évaluation
+        </button>
+        <button class="tab" role="tab" id="tab-settings" aria-controls="view-settings" aria-selected="false" data-view="settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+          Paramètres
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ======================= ÉVALUATION ======================= -->
+    <section class="view" id="view-eval" role="tabpanel" aria-labelledby="tab-eval">
+      <form class="layout" id="eval-form" autocomplete="off" novalidate>
+        <div class="col-form">
+
+          <section class="card" aria-labelledby="h-identite">
+            <header class="card-head">
+              <div>
+                <p class="eyebrow">Étape 1</p>
+                <h2 id="h-identite">Joueur et poste</h2>
+              </div>
+            </header>
+            <div class="field">
+              <label for="joueur">Nom ou pseudo PSN / Xbox</label>
+              <input id="joueur" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="40" placeholder="Ex. BABI_Striker10">
+            </div>
+            <div class="field">
+              <span class="label" id="poste-label">Poste évalué</span>
+              <div class="poste-grid" id="poste-grid" role="radiogroup" aria-labelledby="poste-label"></div>
+              <p class="help" id="poste-help"></p>
+            </div>
+            <div class="field-row">
+              <div class="field">
+                <label for="date-eval">Date <span class="optional">facultatif</span></label>
+                <input id="date-eval" type="date" autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="sessions">Sessions observées <span class="optional">facultatif</span></label>
+                <input id="sessions" type="text" inputmode="numeric" autocomplete="off" placeholder="Ex. 2">
+                <p class="field-msg" id="sessions-msg" aria-live="polite"></p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card" aria-labelledby="h-fc" id="card-fc">
+            <header class="card-head">
+              <div>
+                <p class="eyebrow">Bloc A · 30 points</p>
+                <h2 id="h-fc">Données EA SPORTS FC</h2>
+              </div>
+              <div class="block-pill" id="pill-fc"><strong>0,0</strong><span>/ 30</span></div>
+            </header>
+            <p class="card-intro">Reportez les statistiques affichées dans le jeu. Un champ vide n’est <strong>pas</strong> un zéro : il est signalé comme manquant. Utilisez « N/D » si la donnée n’existe pas.</p>
+            <div class="stat-list" id="fc-list"></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-perf" id="card-perf">
+            <header class="card-head">
+              <div>
+                <p class="eyebrow">Bloc B · 50 points</p>
+                <h2 id="h-perf">Performances observées</h2>
+              </div>
+              <div class="block-pill" id="pill-perf"><strong>0,0</strong><span>/ 50</span></div>
+            </header>
+            <div class="tips" id="perf-tips"></div>
+            <details class="scale">
+              <summary>Échelle de notation (0 à 5, demi-points autorisés)</summary>
+              <ul id="scale-list"></ul>
+            </details>
+            <div class="crit-list" id="perf-list"></div>
+          </section>
+
+          <section class="card" aria-labelledby="h-cons" id="card-cons">
+            <header class="card-head">
+              <div>
+                <p class="eyebrow">Bloc C · 20 points</p>
+                <h2 id="h-cons">Respect des consignes</h2>
+              </div>
+              <div class="block-pill" id="pill-cons"><strong>0,0</strong><span>/ 20</span></div>
+            </header>
+            <p class="card-intro">Respect tactique uniquement. Absences, retards et sanctions disciplinaires ne sont pas pris en compte ici.</p>
+            <div class="crit-list" id="cons-list"></div>
+          </section>
+        </div>
+
+        <aside class="col-result" aria-label="Résultat">
+          <section class="result-card" id="result-card" aria-live="polite">
+            <div class="rc-top">
+              <div class="rc-id">
+                <p class="rc-player" id="rc-player">Joueur non renseigné</p>
+                <p class="rc-pos" id="rc-pos"></p>
+              </div>
+              <span class="badge" id="rc-badge"></span>
+            </div>
+            <div class="rc-score">
+              <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="ring-track" cx="60" cy="60" r="52"/>
+                <circle class="ring-value" id="ring-value" cx="60" cy="60" r="52"/>
+              </svg>
+              <div class="rc-score-text">
+                <span class="rc-total" id="rc-total">0,0</span>
+                <span class="rc-max">/ 100</span>
+              </div>
+            </div>
+            <div class="stars" id="rc-stars" role="img" aria-label="1 étoile sur 3"></div>
+            <p class="rc-mention" id="rc-mention"></p>
+            <p class="rc-status" id="rc-status"></p>
+            <div class="rc-blocks" id="rc-blocks"></div>
+            <ul class="warnings" id="rc-warnings"></ul>
+            <details class="rc-detail">
+              <summary>Détail par critère</summary>
+              <div id="rc-detail"></div>
+            </details>
+          </section>
+
+          <section class="card actions-card" aria-label="Actions">
+            <button type="button" class="btn btn-gold" id="btn-print">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 9V4h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v6H7z"/></svg>
+              Exporter la fiche (PDF)
+            </button>
+            <button type="button" class="btn" id="btn-capture">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/></svg>
+              Capturer / imprimer le résultat
+            </button>
+            <button type="button" class="btn" id="btn-export-eval">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>
+              Exporter le résultat (JSON)
+            </button>
+            <button type="button" class="btn btn-ghost" id="btn-new">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.7M4 4v4h4"/></svg>
+              Nouvelle évaluation
+            </button>
+            <p class="privacy-note">Calcul 100 % local. Rien n’est envoyé ni enregistré : actualiser la page efface la saisie.</p>
+          </section>
+        </aside>
+      </form>
+    </section>
+
+    <!-- ======================= PARAMÈTRES ======================= -->
+    <section class="view" id="view-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
+      <form class="settings" id="settings-form" autocomplete="off" novalidate>
+        <div class="settings-summary" id="settings-summary" aria-live="polite"></div>
+
+        <section class="card" aria-labelledby="h-stars">
+          <header class="card-head"><div><p class="eyebrow">Classement</p><h2 id="h-stars">Étoiles et statut</h2></div></header>
+          <div class="field-row">
+            <div class="field">
+              <label for="set-deux">Seuil 2 étoiles (sur 100)</label>
+              <input id="set-deux" type="text" inputmode="decimal" data-path="etoiles.deux">
+            </div>
+            <div class="field">
+              <label for="set-trois">Seuil 3 étoiles (sur 100)</label>
+              <input id="set-trois" type="text" inputmode="decimal" data-path="etoiles.trois">
+            </div>
+          </div>
+          <div class="star-scale" id="star-scale" aria-hidden="true"></div>
+          <p class="field-msg" data-errors="etoiles"></p>
+          <div class="divider"></div>
+          <label class="switch">
+            <input type="checkbox" id="set-sessions-actif">
+            <span class="switch-ui" aria-hidden="true"></span>
+            <span>Afficher un statut « provisoire » tant que le nombre minimal de sessions n’est pas atteint</span>
+          </label>
+          <div class="field narrow">
+            <label for="set-sessions-min">Nombre minimal de sessions pour un statut confirmé</label>
+            <input id="set-sessions-min" type="text" inputmode="numeric" data-path="sessions.minimum">
+          </div>
+          <p class="help">Ce statut n’apparaît que si le nombre de sessions est saisi dans l’évaluation. L’application ne conserve aucun historique.</p>
+          <p class="field-msg" data-errors="sessions"></p>
+        </section>
+
+        <section class="card" aria-labelledby="h-norm">
+          <header class="card-head"><div><p class="eyebrow">Bloc A</p><h2 id="h-norm">Règles de normalisation</h2></div></header>
+          <p class="card-intro">Chaque statistique EA FC est convertie en note sur 100 grâce à un <strong>seuil de référence</strong> réglable par poste (section suivante).</p>
+          <fieldset class="radio-group">
+            <legend>Statistiques favorables (archétype, buts, passes, B + PD, interceptions)</legend>
+            <label class="radio"><input type="radio" name="rule-pos" value="lineaire"><span><strong>Linéaire plafonnée</strong> — note = min(100, valeur ÷ seuil × 100). Valeur = seuil → 100.</span></label>
+            <label class="radio"><input type="radio" name="rule-pos" value="racine"><span><strong>Racine carrée</strong> — note = min(100, √(valeur ÷ seuil) × 100). Valorise davantage les petites valeurs.</span></label>
+          </fieldset>
+          <fieldset class="radio-group">
+            <legend>Ballons perdus (une valeur basse est favorable)</legend>
+            <label class="radio"><input type="radio" name="rule-neg" value="lineaire"><span><strong>Linéaire (formule de base)</strong> — note = (seuil − valeur) ÷ seuil × 100, bornée entre 0 et 100. Valeur = seuil → 0.</span></label>
+            <label class="radio"><input type="radio" name="rule-neg" value="zone"><span><strong>Linéaire avec zone d’excellence</strong> — 100 tant que la valeur reste sous un pourcentage du seuil, puis décroissance jusqu’à 0 au seuil.</span></label>
+          </fieldset>
+          <div class="field narrow" id="zone-field">
+            <label for="set-zone">Zone d’excellence (en % du seuil)</label>
+            <input id="set-zone" type="text" inputmode="decimal" data-path="normalisation.zoneExcellence">
+          </div>
+          <div class="norm-preview" id="norm-preview"></div>
+          <p class="field-msg" data-errors="normalisation"></p>
+        </section>
+
+        <section class="card" aria-labelledby="h-poste">
+          <header class="card-head"><div><p class="eyebrow">Bloc A · par poste</p><h2 id="h-poste">Coefficients et seuils de référence</h2></div></header>
+          <p class="card-intro">Les six coefficients d’un poste doivent totaliser <strong>100 %</strong>. Seuil des statistiques favorables : valeur qui rapporte 100/100. Seuil des ballons perdus : valeur à partir de laquelle la note tombe à 0.</p>
+          <div class="poste-grid compact" id="set-poste-grid" role="radiogroup" aria-label="Poste à régler"></div>
+          <div class="coef-table" id="coef-table" role="group" aria-label="Coefficients et seuils du poste sélectionné"></div>
+          <div class="total-line" id="coef-total"></div>
+          <p class="field-msg" data-errors="poste"></p>
+          <div class="btn-row">
+            <button type="button" class="btn btn-small" id="btn-seuils-all">Appliquer ces seuils à tous les postes</button>
+            <button type="button" class="btn btn-small btn-ghost" id="btn-reset-poste">Rétablir ce poste</button>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="h-wperf">
+          <header class="card-head"><div><p class="eyebrow">Bloc B</p><h2 id="h-wperf">Poids des performances observées</h2></div></header>
+          <div class="weights" id="w-perf"></div>
+          <div class="total-line" id="w-perf-total"></div>
+          <p class="field-msg" data-errors="poidsPerformance"></p>
+        </section>
+
+        <section class="card" aria-labelledby="h-wcons">
+          <header class="card-head"><div><p class="eyebrow">Bloc C</p><h2 id="h-wcons">Poids du respect des consignes</h2></div></header>
+          <div class="weights" id="w-cons"></div>
+          <div class="total-line" id="w-cons-total"></div>
+          <p class="field-msg" data-errors="poidsConsignes"></p>
+        </section>
+
+        <section class="card" aria-labelledby="h-save">
+          <header class="card-head"><div><p class="eyebrow">Fichiers locaux</p><h2 id="h-save">Sauvegarde des paramètres</h2></div></header>
+          <p class="card-intro">Les paramètres ne sont jamais enregistrés dans le navigateur. Exportez-les dans un fichier pour les réutiliser lors d’une prochaine session. Le fichier ne contient aucune évaluation.</p>
+          <div class="btn-row">
+            <button type="button" class="btn" id="btn-export-settings">Exporter les paramètres</button>
+            <button type="button" class="btn" id="btn-import-settings">Importer les paramètres</button>
+            <input type="file" id="file-import" accept="application/json,.json" hidden>
+          </div>
+          <div class="divider"></div>
+          <button type="button" class="btn btn-danger" id="btn-reset-settings">Rétablir les paramètres initiaux</button>
+        </section>
+
+        <section class="card privacy-card" aria-labelledby="h-privacy">
+          <header class="card-head"><div><p class="eyebrow">Confidentialité</p><h2 id="h-privacy">Aucune donnée ne quitte cet appareil</h2></div></header>
+          <ul class="bullets">
+            <li>Pas de compte, pas de serveur, pas de statistiques de visite.</li>
+            <li>Saisies et paramètres restent en mémoire vive : actualiser ou fermer la page les efface.</li>
+            <li>Le mode hors ligne ne met en cache que les fichiers de l’application.</li>
+            <li>Les exports sont des fichiers créés sur votre appareil, uniquement à votre demande.</li>
+          </ul>
+        </section>
+      </form>
+    </section>
+  </main>
+
+  <button type="button" class="scorebar" id="scorebar" aria-label="Voir le résultat">
+    <span class="sb-score"><strong id="sb-total">0,0</strong><span>/100</span></span>
+    <span class="sb-stars" id="sb-stars"></span>
+    <span class="sb-mention" id="sb-mention"></span>
+    <svg class="sb-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+  </button>
+
+  <!-- Fiche imprimable (visible uniquement à l'impression) -->
+  <div id="print-root" class="print-root" aria-hidden="true"></div>
+
+  <dialog class="modal" id="dlg-confirm" aria-labelledby="dlg-confirm-title">
+    <div class="modal-body">
+      <h3 id="dlg-confirm-title"></h3>
+      <div class="modal-text" id="dlg-confirm-text"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-ghost" id="dlg-confirm-cancel">Annuler</button>
+        <button type="button" class="btn btn-gold" id="dlg-confirm-ok">Confirmer</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="modal capture" id="dlg-capture" aria-label="Fiche de résultat">
+    <div class="capture-scroll">
+      <div id="capture-sheet"></div>
+      <div class="capture-actions">
+        <button type="button" class="btn btn-gold" id="capture-print">Imprimer / PDF</button>
+        <button type="button" class="btn btn-ghost" id="capture-close">Fermer</button>
+      </div>
+      <p class="capture-hint">Astuce iPhone : bouton latéral + volume haut pour une capture d’écran.</p>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="js/scoring.js"></script>
+  <script src="js/content.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

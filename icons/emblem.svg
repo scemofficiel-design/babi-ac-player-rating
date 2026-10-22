@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Emblème BABI A.C">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f6d98a"/>
+      <stop offset="1" stop-color="#c08f2f"/>
+    </linearGradient>
+    <linearGradient id="f" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16213d"/>
+      <stop offset="1" stop-color="#070b17"/>
+    </linearGradient>
+  </defs>
+  <path d="M32 3.5 56.5 11.5V30c0 15.2-10.4 25.6-24.5 30.5C17.9 55.6 7.5 45.2 7.5 30V11.5Z" fill="url(#f)" stroke="url(#g)" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M32 9.5 51 15.8V30c0 11.9-7.9 20.4-19 24.6C20.9 50.4 13 41.9 13 30V15.8Z" fill="none" stroke="#e3b54a" stroke-opacity=".35" stroke-width="1"/>
+  <text x="32" y="34.5" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-weight="800" font-size="13.5" letter-spacing="-0.2" fill="url(#g)">BABI</text>
+  <text x="32.8" y="46" text-anchor="middle" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="8.5" letter-spacing="1.6" fill="#e3b54a">A.C</text>
+</svg>
